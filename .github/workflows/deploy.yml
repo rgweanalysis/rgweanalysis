@@ -11,29 +11,15 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-
-      - name: Install deps
-        run: npm ci
-
-      - name: Build
-        run: |
-          npm run build
 
       - name: Deploy to public repo
         uses: peaceiris/actions-gh-pages@v4
         with:
           external_repository: mohamedlasheenanalysis/rgwe-site
           publish_branch: gh-pages
-          publish_dir: dist
+          publish_dir: .
           deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
           commit_message: "deploy: ${{ github.repository }}@${{ github.sha }}"
