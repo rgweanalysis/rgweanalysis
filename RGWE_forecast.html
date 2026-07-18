@@ -3713,10 +3713,14 @@
     place-items:center;
     overflow:auto;
     padding:clamp(18px,3.5vw,54px);
-    background:
+    background-color:#081523;
+    background-image:
       linear-gradient(90deg,rgba(3,15,30,.38) 0%,rgba(3,15,30,.18) 45%,rgba(3,15,30,.56) 100%),
       linear-gradient(180deg,rgba(1,12,25,.12),rgba(1,12,25,.48)),
-      url("rgwe-login-bg.jpeg") center center / cover no-repeat;
+      url("rgwe-login-bg.jpeg");
+    background-position:center center,center center,left center;
+    background-repeat:no-repeat,no-repeat,no-repeat;
+    background-size:auto,auto,68% auto;
     font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;
     color:#0f172a;
   }
@@ -3729,6 +3733,13 @@
     background:
       radial-gradient(circle at 18% 12%,rgba(255,178,79,.20),transparent 30%),
       radial-gradient(circle at 82% 20%,rgba(14,165,233,.12),transparent 28%);
+  }
+
+  @media(min-width:1280px){
+    #rgwe-pw-overlay{
+      background-size:auto,auto,62% auto;
+      background-position:center center,center center,left center;
+    }
   }
 
   #rgwe-pw-layout{
