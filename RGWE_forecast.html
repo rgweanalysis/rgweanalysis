@@ -3701,6 +3701,66 @@
   }
 </style>
 
+
+<style id="rgwe-logout-style">
+  #rgweLogoutBtn{
+    min-height:38px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:8px 13px;
+    border:1px solid rgba(220,38,38,.18);
+    border-radius:14px;
+    background:linear-gradient(180deg,#fff,#fff7f7);
+    color:#b91c1c;
+    box-shadow:0 7px 18px rgba(15,23,42,.06);
+    font-size:12px;
+    font-weight:900;
+    white-space:nowrap;
+    cursor:pointer;
+    transition:
+      transform .14s ease,
+      border-color .18s ease,
+      background .18s ease,
+      box-shadow .18s ease,
+      color .18s ease;
+  }
+
+  #rgweLogoutBtn:hover{
+    transform:translateY(-1px);
+    border-color:rgba(220,38,38,.34);
+    background:linear-gradient(180deg,#fff7f7,#fee2e2);
+    color:#991b1b;
+    box-shadow:0 10px 23px rgba(185,28,28,.14);
+  }
+
+  #rgweLogoutBtn:focus-visible{
+    outline:none;
+    box-shadow:0 0 0 4px rgba(239,68,68,.15);
+  }
+
+  #rgweLogoutBtn:active{transform:translateY(0)}
+
+  #rgweLogoutBtn svg{
+    width:17px;
+    height:17px;
+    flex:0 0 auto;
+  }
+
+  @media(max-width:720px){
+    #rgweLogoutBtn{
+      width:38px;
+      min-width:38px;
+      padding:8px;
+    }
+
+    #rgweLogoutLabel{
+      display:none;
+    }
+  }
+</style>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
 <!-- BEGIN: Site-level password gate (soft lock) -->
@@ -4340,6 +4400,14 @@
 <option value="en">English</option>
 </select>
 <button class="px-3 py-1.5 rounded-2xl bg-blue-600 text-white hover:bg-blue-700" id="locBtn">استخدم موقعي</button>
+<button id="rgweLogoutBtn" type="button" aria-label="تسجيل الخروج" title="تسجيل الخروج">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+    <path d="M10 5H6.8A2.8 2.8 0 0 0 4 7.8v8.4A2.8 2.8 0 0 0 6.8 19H10"/>
+    <path d="M14 8l4 4-4 4"/>
+    <path d="M18 12H9"/>
+  </svg>
+  <span id="rgweLogoutLabel">تسجيل الخروج</span>
+</button>
 </div>
 </div>
 </header>
@@ -8469,6 +8537,49 @@ document.addEventListener('DOMContentLoaded', function(){
     }
   })();
   </script>
+
+
+<script id="rgwe-logout-script">
+(function(){
+  const logoutButton = document.getElementById("rgweLogoutBtn");
+  const logoutLabel = document.getElementById("rgweLogoutLabel");
+  const SESSION_KEY = "rgwe_pw_ok";
+
+  if (!logoutButton) return;
+
+  function updateLogoutLanguage(){
+    const locale =
+      localStorage.getItem("locale") ||
+      document.documentElement.lang ||
+      "ar";
+
+    const isEnglish = String(locale).toLowerCase().startsWith("en");
+    const label = isEnglish ? "Logout" : "تسجيل الخروج";
+
+    if (logoutLabel) logoutLabel.textContent = label;
+    logoutButton.setAttribute("aria-label", label);
+    logoutButton.setAttribute("title", label);
+  }
+
+  logoutButton.addEventListener("click", function(){
+    try{
+      sessionStorage.removeItem(SESSION_KEY);
+    }catch(_){}
+
+    document.documentElement.style.overflow = "hidden";
+    window.location.reload();
+  });
+
+  updateLogoutLanguage();
+
+  const languageSelect = document.getElementById("langSelect");
+  if (languageSelect){
+    languageSelect.addEventListener("change", function(){
+      window.setTimeout(updateLogoutLanguage, 0);
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
