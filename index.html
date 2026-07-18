@@ -23,10 +23,14 @@
       margin:0;
       font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
       color:var(--ink);
-      background:
-        radial-gradient(circle at 10% 4%,rgba(14,165,233,.25),transparent 30%),
-        radial-gradient(circle at 92% 12%,rgba(34,197,94,.20),transparent 34%),
-        linear-gradient(135deg,#f8fbff,#eef7fb 52%,#f8fafc);
+      background-color:#0b1f2a;
+      background-image:
+        linear-gradient(180deg,rgba(4,15,24,.48),rgba(4,15,24,.68)),
+        url("./wind_bg.gif");
+      background-position:center center,center center;
+      background-size:cover,cover;
+      background-repeat:no-repeat,no-repeat;
+      background-attachment:fixed,fixed;
       overflow-x:hidden;
       padding-bottom:58px;
     }
@@ -36,10 +40,11 @@
       inset:0;
       pointer-events:none;
       background-image:
-        linear-gradient(rgba(15,23,42,.025) 1px,transparent 1px),
-        linear-gradient(90deg,rgba(15,23,42,.025) 1px,transparent 1px);
+        linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),
+        linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);
       background-size:32px 32px;
-      mask-image:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 85%);
+      mask-image:linear-gradient(to bottom,rgba(0,0,0,.65),transparent 88%);
+      -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,.65),transparent 88%);
     }
     .header{
       position:sticky;
@@ -79,11 +84,11 @@
     .eyebrow{
       display:inline-flex;align-items:center;gap:8px;
       padding:8px 12px;border-radius:999px;
-      background:rgba(255,255,255,.72);border:1px solid var(--line);
+      background:rgba(255,255,255,.86);border:1px solid rgba(255,255,255,.42);
       color:#075985;font-size:10px;font-weight:950;letter-spacing:.11em;text-transform:uppercase;
-      box-shadow:var(--shadow-soft);
+      box-shadow:var(--shadow-soft);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
     }
-    .hero p{margin:16px auto 0;max-width:720px;color:#526075;font-size:16px;line-height:1.62;font-weight:620}
+    .hero p{margin:16px auto 0;max-width:720px;color:rgba(255,255,255,.92);font-size:16px;line-height:1.62;font-weight:650;text-shadow:0 2px 14px rgba(2,6,23,.48)}
     .sites-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;margin-top:18px}
     .site-card{
       position:relative;
@@ -162,6 +167,7 @@
       -webkit-backdrop-filter:blur(15px) saturate(170%);
     }
     @media(max-width:760px){
+      body{background-attachment:scroll,scroll}
       .header{padding:12px 14px}.badge{display:none}
       main{padding:22px 12px 46px}.hero{padding:24px 10px 22px}
       .sites-grid{grid-template-columns:1fr}.site-card{min-height:325px;padding:22px;border-radius:25px}.site-logo{width:142px;height:72px}
