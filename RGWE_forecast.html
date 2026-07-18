@@ -3499,6 +3499,71 @@
   html.dark .rgwe-prod-donut-html-legend-dot { box-shadow: 0 0 0 2px rgba(15,23,42,.76); }
 </style>
 
+
+<style id="rgwe-site-wind-background">
+  /* Match the animated background used by the RGWE Site Platform. */
+  html {
+    min-height: 100%;
+    background: #eef7fb;
+  }
+
+  body {
+    position: relative;
+    isolation: isolate;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: transparent !important;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 9% 4%, rgba(14,165,233,.30), transparent 29%),
+      radial-gradient(circle at 88% 12%, rgba(34,197,94,.22), transparent 33%),
+      radial-gradient(circle at 55% 90%, rgba(37,99,235,.13), transparent 34%),
+      linear-gradient(135deg, rgba(255,255,255,.96), rgba(238,247,251,.70) 50%, rgba(255,255,255,.88)),
+      url('wind_bg.gif') center / cover no-repeat;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.24), rgba(255,255,255,.52));
+    backdrop-filter: saturate(155%) blur(2px);
+    -webkit-backdrop-filter: saturate(155%) blur(2px);
+  }
+
+  /* Keep the same background visible when the page switches to dark mode. */
+  html.dark body {
+    background: transparent !important;
+  }
+
+  html.dark body::before {
+    background:
+      radial-gradient(circle at 9% 4%, rgba(14,165,233,.18), transparent 29%),
+      radial-gradient(circle at 88% 12%, rgba(34,197,94,.13), transparent 33%),
+      linear-gradient(135deg, rgba(2,6,23,.88), rgba(15,23,42,.76) 52%, rgba(2,6,23,.88)),
+      url('wind_bg.gif') center / cover no-repeat;
+  }
+
+  html.dark body::after {
+    background: linear-gradient(180deg, rgba(2,6,23,.18), rgba(2,6,23,.44));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::before {
+      background-attachment: scroll;
+    }
+  }
+</style>
+
 </head>
 <body class="bg-gray-50 min-h-screen">
 <!-- BEGIN: Site-level password gate (soft lock) -->
