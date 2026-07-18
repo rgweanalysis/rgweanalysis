@@ -50,32 +50,29 @@
       position:sticky;
       top:0;
       z-index:20;
-      display:flex;
-      justify-content:space-between;
+      display:grid;
+      grid-template-columns:minmax(120px,1fr) minmax(280px,2fr) minmax(120px,1fr);
       align-items:center;
-      gap:16px;
-      padding:14px 24px;
-      background:rgba(255,255,255,.86);
+      gap:22px;
+      min-height:98px;
+      padding:12px 28px;
+      background:rgba(255,255,255,.90);
       border-bottom:1px solid var(--line);
       backdrop-filter:blur(15px) saturate(170%);
       -webkit-backdrop-filter:blur(15px) saturate(170%);
     }
-    .brand{display:flex;align-items:center;gap:13px}
-    .mark{
-      width:44px;height:44px;border-radius:15px;
-      display:grid;place-items:center;
-      font-weight:950;color:#fff;font-size:14px;
-      background:linear-gradient(135deg,var(--blue),var(--green));
-      box-shadow:0 10px 24px rgba(14,165,233,.24);
+    .header-logo{
+      width:min(210px,100%);
+      height:72px;
+      display:flex;
+      align-items:center;
     }
-    .brand h1{margin:0;font-size:18px;letter-spacing:-.025em}
-    .brand p{margin:3px 0 0;color:var(--muted);font-size:11px;font-weight:760}
-    .badge{
-      padding:8px 12px;border-radius:999px;
-      color:#075985;background:rgba(14,165,233,.11);
-      border:1px solid rgba(14,165,233,.22);
-      font-size:10px;font-weight:950;letter-spacing:.08em;text-transform:uppercase;
-    }
+    .header-logo.left{justify-self:start;justify-content:flex-start}
+    .header-logo.right{justify-self:end;justify-content:flex-end}
+    .header-logo img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+    .header-title{text-align:center;min-width:0}
+    .header-title h1{margin:0;font-size:clamp(19px,2vw,27px);line-height:1.12;letter-spacing:-.035em}
+    .header-title p{margin:6px 0 0;color:var(--muted);font-size:clamp(10px,1vw,13px);line-height:1.35;font-weight:760}
     main{width:min(1180px,100%);margin:0 auto;padding:34px 20px 52px;position:relative;z-index:1}
     .hero{
       text-align:center;
@@ -170,22 +167,35 @@
     }
     @media(max-width:760px){
       body{background-attachment:scroll,scroll}
-      .header{padding:12px 14px}.badge{display:none}
+      .header{grid-template-columns:82px minmax(0,1fr) 82px;gap:8px;min-height:82px;padding:8px 10px}
+      .header-logo{width:82px;height:54px}
+      .header-title h1{font-size:15px;line-height:1.15}
+      .header-title p{margin-top:4px;font-size:8.5px;line-height:1.25}
       main{padding:22px 12px 46px}.hero{padding:24px 10px 22px}
       .sites-grid{grid-template-columns:1fr}.site-card{min-height:325px;padding:22px;border-radius:25px}.site-logo{width:min(205px,62%);height:82px}
+    }
+    @media(max-width:430px){
+      .header{grid-template-columns:66px minmax(0,1fr) 66px;gap:5px;padding:7px 7px}
+      .header-logo{width:66px;height:46px}
+      .header-title h1{font-size:13px}
+      .header-title p{font-size:7.5px}
     }
   </style>
 </head>
 <body>
   <header class="header">
-    <div class="brand">
-      <div class="mark">WE</div>
-      <div>
-        <h1>Wind Energy Sites Platform</h1>
-        <p>Unified gateway for RGWE and RSWE operational tools</p>
-      </div>
+    <div class="header-logo left">
+      <img src="rswe-logo.jpeg" alt="Red Sea Wind Energy logo" decoding="async" />
     </div>
-    <div class="badge">Internal Sites Hub</div>
+
+    <div class="header-title">
+      <h1>Wind Energy Sites Platform</h1>
+      <p>Unified gateway for RGWE and RSWE operational tools</p>
+    </div>
+
+    <div class="header-logo right">
+      <img src="rgwe-logo.png" alt="Ras Ghareb Wind Energy logo" decoding="async" />
+    </div>
   </header>
 
   <main>
