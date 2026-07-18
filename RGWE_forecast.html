@@ -3705,65 +3705,620 @@
 <body class="bg-gray-50 min-h-screen">
 <!-- BEGIN: Site-level password gate (soft lock) -->
 <style id="rgwe-password-gate-style">
-  #rgwe-pw-overlay {position: fixed; inset: 0; z-index: 99999; display: grid; place-items: center; backdrop-filter: blur(6px); background: rgba(0,0,0,.35);}
-  #rgwe-pw-card {background: white; border-radius: 16px; padding: 20px; width: min(92%, 380px);
-    box-shadow: 0 10px 25px rgba(0,0,0,.25); direction: rtl;
-    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", "Helvetica Neue", Arial;}
-  #rgwe-pw-card h2 {margin: 0 0 8px; font-size: 1.1rem;}
-  #rgwe-pw-card p  {margin: 0 0 12px; font-size: .9rem; color: #4b5563;}
-  #rgwe-pw-card input[type=password]{width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid #e5e7eb; margin: 6px 0 10px;}
-  #rgwe-pw-card button{width: 100%; padding: 10px 12px; border-radius: 9999px; border: none; cursor: pointer; background: #059669; color: white; font-weight: 600;}
-  #rgwe-pw-err { color: #b91c1c; font-size: .85rem; min-height: 1.2em; margin-top: 6px; }
-  .dark #rgwe-pw-card{ background:#0f172a; color:#e5e7eb; }
-  .dark #rgwe-pw-card p{ color:#94a3b8; }
-  .dark #rgwe-pw-card input[type=password]{ background:#0b1220; color:#e5e7eb; border-color:#334155; }
+  #rgwe-pw-overlay{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:grid;
+    place-items:center;
+    overflow:auto;
+    padding:clamp(18px,3.5vw,54px);
+    background:
+      linear-gradient(90deg,rgba(3,15,30,.38) 0%,rgba(3,15,30,.18) 45%,rgba(3,15,30,.56) 100%),
+      linear-gradient(180deg,rgba(1,12,25,.12),rgba(1,12,25,.48)),
+      url("rgwe-login-bg.jpeg") center center / cover no-repeat;
+    font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",Arial,sans-serif;
+    color:#0f172a;
+  }
+
+  #rgwe-pw-overlay::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      radial-gradient(circle at 18% 12%,rgba(255,178,79,.20),transparent 30%),
+      radial-gradient(circle at 82% 20%,rgba(14,165,233,.12),transparent 28%);
+  }
+
+  #rgwe-pw-layout{
+    position:relative;
+    z-index:1;
+    width:min(100%,1420px);
+    min-height:min(780px,calc(100vh - clamp(36px,7vw,108px)));
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(380px,520px);
+    align-items:center;
+    gap:clamp(34px,6vw,92px);
+  }
+
+  #rgwe-pw-brand{
+    align-self:stretch;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-width:0;
+    padding:6px 0;
+    color:#fff;
+    text-shadow:0 2px 18px rgba(0,0,0,.35);
+  }
+
+  .rgwe-login-trust{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    width:max-content;
+    max-width:100%;
+    padding:9px 13px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;
+    background:rgba(5,24,43,.30);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    font-size:12px;
+    font-weight:800;
+    letter-spacing:.02em;
+  }
+
+  .rgwe-login-trust svg{width:18px;height:18px;flex:0 0 auto}
+
+  .rgwe-login-copy{
+    max-width:700px;
+    padding:clamp(48px,10vh,120px) 0 30px;
+  }
+
+  .rgwe-login-kicker{
+    margin:0 0 15px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:#dff6ff;
+  }
+
+  #rgwe-pw-brand h1{
+    margin:0;
+    max-width:680px;
+    font-size:clamp(44px,5.4vw,76px);
+    line-height:.94;
+    letter-spacing:-.055em;
+    font-weight:950;
+  }
+
+  #rgwe-pw-brand .brand-description{
+    margin:20px 0 0;
+    max-width:620px;
+    color:rgba(255,255,255,.88);
+    font-size:clamp(15px,1.5vw,19px);
+    line-height:1.65;
+    font-weight:520;
+  }
+
+  .rgwe-login-values{
+    display:flex;
+    align-items:center;
+    gap:12px 24px;
+    flex-wrap:wrap;
+    padding-top:24px;
+    border-top:1px solid rgba(255,255,255,.24);
+    color:rgba(255,255,255,.88);
+    font-size:12px;
+    font-weight:800;
+  }
+
+  .rgwe-login-value{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    white-space:nowrap;
+  }
+
+  .rgwe-login-value::before{
+    content:"";
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:linear-gradient(135deg,#38bdf8,#4ade80);
+    box-shadow:0 0 0 4px rgba(255,255,255,.10);
+  }
+
+  #rgwe-pw-card{
+    width:100%;
+    padding:clamp(28px,3.4vw,46px);
+    border:1px solid rgba(255,255,255,.72);
+    border-radius:30px;
+    background:rgba(255,255,255,.95);
+    box-shadow:
+      0 36px 90px rgba(1,10,24,.38),
+      inset 0 1px 0 rgba(255,255,255,.95);
+    backdrop-filter:saturate(145%) blur(18px);
+    -webkit-backdrop-filter:saturate(145%) blur(18px);
+    direction:ltr;
+  }
+
+  .rgwe-login-logo-wrap{
+    display:flex;
+    justify-content:center;
+    margin-bottom:25px;
+  }
+
+  .rgwe-login-logo{
+    display:block;
+    width:min(100%,340px);
+    max-height:90px;
+    object-fit:contain;
+  }
+
+  .rgwe-login-heading{
+    text-align:center;
+    margin-bottom:28px;
+  }
+
+  #rgwe-pw-title{
+    margin:0;
+    color:#0b3152;
+    font-size:clamp(27px,2.4vw,35px);
+    line-height:1.08;
+    letter-spacing:-.04em;
+    font-weight:950;
+  }
+
+  .rgwe-title-accent{
+    width:54px;
+    height:4px;
+    margin:14px auto 13px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#075985,#0ea5e9,#22c55e);
+  }
+
+  #rgwe-pw-description{
+    margin:0;
+    color:#64748b;
+    font-size:14px;
+    line-height:1.55;
+    font-weight:600;
+  }
+
+  .rgwe-pw-label{
+    display:block;
+    margin:0 0 8px;
+    color:#334155;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.035em;
+    text-transform:uppercase;
+  }
+
+  .rgwe-pw-field{
+    position:relative;
+    display:flex;
+    align-items:center;
+  }
+
+  .rgwe-pw-field-icon{
+    position:absolute;
+    left:16px;
+    width:21px;
+    height:21px;
+    color:#64748b;
+    pointer-events:none;
+    z-index:2;
+  }
+
+  #rgwe-pw-input{
+    width:100%;
+    min-height:58px;
+    margin:0;
+    padding:0 57px 0 50px;
+    border:1px solid #cbd5e1;
+    border-radius:16px;
+    outline:none;
+    background:#fff;
+    color:#0f172a;
+    font-size:16px;
+    font-weight:700;
+    letter-spacing:.04em;
+    transition:border-color .18s ease,box-shadow .18s ease,background .18s ease;
+  }
+
+  #rgwe-pw-input::placeholder{
+    color:#94a3b8;
+    font-weight:600;
+    letter-spacing:0;
+  }
+
+  #rgwe-pw-input:focus{
+    border-color:#0ea5e9;
+    box-shadow:0 0 0 5px rgba(14,165,233,.13);
+  }
+
+  #rgwe-pw-toggle{
+    position:absolute;
+    right:10px;
+    width:40px;
+    height:40px;
+    display:grid;
+    place-items:center;
+    padding:0;
+    border:0;
+    border-radius:12px;
+    background:transparent;
+    color:#64748b;
+    cursor:pointer;
+    transition:background .16s ease,color .16s ease;
+  }
+
+  #rgwe-pw-toggle:hover{
+    background:#f1f5f9;
+    color:#075985;
+  }
+
+  #rgwe-pw-toggle svg{width:20px;height:20px}
+
+  #rgwe-pw-submit{
+    position:relative;
+    width:100%;
+    min-height:58px;
+    margin-top:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:12px 20px;
+    border:0;
+    border-radius:16px;
+    color:#fff;
+    background:linear-gradient(135deg,#075985 0%,#0284c7 58%,#0ea5e9 100%);
+    box-shadow:0 16px 30px rgba(2,132,199,.27);
+    font-size:15px;
+    font-weight:950;
+    cursor:pointer;
+    transition:transform .14s ease,box-shadow .18s ease,filter .18s ease;
+  }
+
+  #rgwe-pw-submit:hover{
+    transform:translateY(-1px);
+    box-shadow:0 20px 38px rgba(2,132,199,.34);
+    filter:saturate(1.08);
+  }
+
+  #rgwe-pw-submit:active{transform:translateY(0)}
+  #rgwe-pw-submit:disabled{cursor:wait;opacity:.78;transform:none}
+
+  #rgwe-pw-submit svg{
+    width:19px;
+    height:19px;
+    transition:transform .16s ease;
+  }
+
+  #rgwe-pw-submit:hover svg{transform:translateX(3px)}
+
+  #rgwe-pw-err{
+    min-height:20px;
+    margin-top:10px;
+    color:#b91c1c;
+    font-size:12.5px;
+    font-weight:750;
+    text-align:center;
+  }
+
+  .rgwe-login-protection{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    margin-top:23px;
+    padding-top:20px;
+    border-top:1px solid #e2e8f0;
+    color:#64748b;
+    font-size:12px;
+    font-weight:750;
+  }
+
+  .rgwe-login-protection svg{
+    width:18px;
+    height:18px;
+    color:#0f766e;
+  }
+
+  .rgwe-login-copyright{
+    margin:20px 0 0;
+    color:#94a3b8;
+    font-size:10.5px;
+    text-align:center;
+    font-weight:650;
+  }
+
+  #rgwe-pw-card.rgwe-login-shake{
+    animation:rgweLoginShake .34s ease;
+  }
+
+  #rgwe-pw-overlay.rgwe-login-success{
+    animation:rgweLoginFade .34s ease forwards;
+  }
+
+  @keyframes rgweLoginShake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-7px)}
+    75%{transform:translateX(7px)}
+  }
+
+  @keyframes rgweLoginFade{
+    to{opacity:0;visibility:hidden}
+  }
+
+  @media(max-width:960px){
+    #rgwe-pw-overlay{
+      place-items:center;
+      background:
+        linear-gradient(180deg,rgba(3,15,30,.44),rgba(3,15,30,.58)),
+        url("rgwe-login-bg.jpeg") center center / cover no-repeat;
+    }
+
+    #rgwe-pw-layout{
+      min-height:auto;
+      grid-template-columns:1fr;
+      width:min(100%,560px);
+    }
+
+    #rgwe-pw-brand{
+      display:block;
+      text-align:center;
+    }
+
+    .rgwe-login-trust{
+      margin:0 auto;
+    }
+
+    .rgwe-login-copy{
+      padding:28px 0 12px;
+    }
+
+    #rgwe-pw-brand h1{
+      font-size:clamp(36px,9vw,54px);
+    }
+
+    #rgwe-pw-brand .brand-description,
+    .rgwe-login-values{
+      display:none;
+    }
+  }
+
+  @media(max-width:560px){
+    #rgwe-pw-overlay{
+      padding:14px;
+      align-items:start;
+    }
+
+    #rgwe-pw-layout{
+      gap:16px;
+      margin:auto 0;
+    }
+
+    .rgwe-login-copy{padding:18px 0 2px}
+    .rgwe-login-kicker{font-size:10px;margin-bottom:8px}
+    #rgwe-pw-brand h1{font-size:34px}
+
+    #rgwe-pw-card{
+      padding:25px 19px;
+      border-radius:24px;
+    }
+
+    .rgwe-login-logo{
+      width:min(100%,280px);
+      max-height:72px;
+    }
+
+    #rgwe-pw-title{font-size:27px}
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    #rgwe-pw-card,
+    #rgwe-pw-overlay,
+    #rgwe-pw-submit,
+    #rgwe-pw-submit svg{
+      animation:none !important;
+      transition:none !important;
+    }
+  }
 </style>
-<div id="rgwe-pw-overlay" role="dialog" aria-modal="true">
-  <div id="rgwe-pw-card">
-    <h2>حماية بكلمة مرور</h2>
-    <p>من فضلك أدخل كلمة المرور للمتابعة.</p>
-    <form id="rgwe-pw-form">
-      <input id="rgwe-pw-input" type="password" placeholder="••••••••" autocomplete="current-password" />
-      <button type="submit">دخول</button>
-      <div id="rgwe-pw-err" aria-live="polite"></div>
-    </form>
+
+<div id="rgwe-pw-overlay" role="dialog" aria-modal="true" aria-labelledby="rgwe-pw-title" aria-describedby="rgwe-pw-description">
+  <div id="rgwe-pw-layout">
+    <section id="rgwe-pw-brand" aria-label="RGWE Forecast platform">
+      <div class="rgwe-login-trust">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M12 3 4.8 6v5.2c0 4.7 2.8 8 7.2 9.8 4.4-1.8 7.2-5.1 7.2-9.8V6L12 3Z"/>
+          <path d="m9.4 12 1.7 1.7 3.8-4"/>
+        </svg>
+        Secure · Reliable · Sustainable
+      </div>
+
+      <div class="rgwe-login-copy">
+        <p class="rgwe-login-kicker">Ras Ghareb Wind Energy</p>
+        <h1>Forecast Intelligence Platform</h1>
+        <p class="brand-description">
+          Secure access to RGWE forecasting, performance insights, and operational decision-support tools.
+        </p>
+      </div>
+
+      <div class="rgwe-login-values" aria-label="Platform values">
+        <span class="rgwe-login-value">Safety First</span>
+        <span class="rgwe-login-value">Operational Excellence</span>
+        <span class="rgwe-login-value">Sustainable Impact</span>
+      </div>
+    </section>
+
+    <section id="rgwe-pw-card">
+      <div class="rgwe-login-logo-wrap">
+        <img class="rgwe-login-logo" src="rgwe-logo.png" alt="Ras Ghareb Wind Energy logo" />
+      </div>
+
+      <div class="rgwe-login-heading">
+        <h2 id="rgwe-pw-title">RGWE Forecast</h2>
+        <div class="rgwe-title-accent" aria-hidden="true"></div>
+        <p id="rgwe-pw-description">Enter your authorized password to access the forecast platform.</p>
+      </div>
+
+      <form id="rgwe-pw-form" novalidate>
+        <label class="rgwe-pw-label" for="rgwe-pw-input">Access Password</label>
+
+        <div class="rgwe-pw-field">
+          <svg class="rgwe-pw-field-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <rect x="4.5" y="10" width="15" height="10" rx="2"/>
+            <path d="M8 10V7.5a4 4 0 0 1 8 0V10"/>
+          </svg>
+
+          <input
+            id="rgwe-pw-input"
+            type="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+            required
+            aria-describedby="rgwe-pw-err"
+          />
+
+          <button id="rgwe-pw-toggle" type="button" aria-label="Show password" title="Show password">
+            <svg class="rgwe-eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <path d="M2.8 12s3.4-5.5 9.2-5.5 9.2 5.5 9.2 5.5-3.4 5.5-9.2 5.5S2.8 12 2.8 12Z"/>
+              <circle cx="12" cy="12" r="2.5"/>
+            </svg>
+          </button>
+        </div>
+
+        <button id="rgwe-pw-submit" type="submit">
+          <span id="rgwe-pw-submit-label">Sign In</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6"/>
+          </svg>
+        </button>
+
+        <div id="rgwe-pw-err" role="alert" aria-live="polite"></div>
+      </form>
+
+      <div class="rgwe-login-protection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M12 3 4.8 6v5.2c0 4.7 2.8 8 7.2 9.8 4.4-1.8 7.2-5.1 7.2-9.8V6L12 3Z"/>
+          <path d="m9.4 12 1.7 1.7 3.8-4"/>
+        </svg>
+        Your access is protected
+      </div>
+
+      <p class="rgwe-login-copyright">© RGWE · Authorized personnel only</p>
+    </section>
   </div>
 </div>
+
 <script id="rgwe-password-gate-script">
 (function(){
   const HASH_HEX = "94edf28c6d6da38fd35d7ad53e485307f89fbeaf120485c8d17a43f323deee71"; // sha256("666666")
   const REMEMBER_KEY = "rgwe_pw_ok";
+
   const overlay = document.getElementById("rgwe-pw-overlay");
-  const form    = document.getElementById("rgwe-pw-form");
-  const input   = document.getElementById("rgwe-pw-input");
-  const errEl   = document.getElementById("rgwe-pw-err");
+  const card = document.getElementById("rgwe-pw-card");
+  const form = document.getElementById("rgwe-pw-form");
+  const input = document.getElementById("rgwe-pw-input");
+  const toggle = document.getElementById("rgwe-pw-toggle");
+  const submit = document.getElementById("rgwe-pw-submit");
+  const submitLabel = document.getElementById("rgwe-pw-submit-label");
+  const errEl = document.getElementById("rgwe-pw-err");
 
   if (!overlay || !form || !input) return;
 
-  try{ if (sessionStorage.getItem(REMEMBER_KEY) === "1"){ overlay.remove(); return; } }catch(_){}
-
-  async function sha256Hex(s){
-    const enc = new TextEncoder();
-    const buf = await crypto.subtle.digest("SHA-256", enc.encode(s));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,"0")).join("");
+  function restorePageScroll(){
+    document.documentElement.style.overflow = "";
   }
 
-  form.addEventListener("submit", async (e)=>{
-    e.preventDefault();
-    const val = (input.value || "").trim();
-    try {
-      const got = await sha256Hex(val);
-      if (got === HASH_HEX){
-        try{ sessionStorage.setItem(REMEMBER_KEY, "1"); }catch(_){}
-        overlay.remove();
-      }else{
-        errEl.textContent = "كلمة المرور غير صحيحة";
-      }
-    }catch(err){
-      errEl.textContent = "حدث خطأ غير متوقع";
-      console.error(err);
+  try{
+    if (sessionStorage.getItem(REMEMBER_KEY) === "1"){
+      overlay.remove();
+      return;
     }
-  }, {passive:false});
+  }catch(_){}
+
+  document.documentElement.style.overflow = "hidden";
+
+  async function sha256Hex(value){
+    const encoded = new TextEncoder().encode(value);
+    const buffer = await crypto.subtle.digest("SHA-256", encoded);
+    return Array.from(new Uint8Array(buffer))
+      .map(byte => byte.toString(16).padStart(2,"0"))
+      .join("");
+  }
+
+  function setBusy(isBusy){
+    if (!submit) return;
+    submit.disabled = isBusy;
+    if (submitLabel) submitLabel.textContent = isBusy ? "Verifying..." : "Sign In";
+  }
+
+  function showError(message){
+    if (errEl) errEl.textContent = message;
+    if (card){
+      card.classList.remove("rgwe-login-shake");
+      void card.offsetWidth;
+      card.classList.add("rgwe-login-shake");
+    }
+  }
+
+  if (toggle){
+    toggle.addEventListener("click", function(){
+      const shouldShow = input.type === "password";
+      input.type = shouldShow ? "text" : "password";
+      toggle.setAttribute("aria-label", shouldShow ? "Hide password" : "Show password");
+      toggle.setAttribute("title", shouldShow ? "Hide password" : "Show password");
+      input.focus();
+    });
+  }
+
+  input.addEventListener("input", function(){
+    if (errEl) errEl.textContent = "";
+  });
+
+  form.addEventListener("submit", async function(event){
+    event.preventDefault();
+
+    const value = (input.value || "").trim();
+    if (!value){
+      showError("Please enter your password.");
+      input.focus();
+      return;
+    }
+
+    setBusy(true);
+    if (errEl) errEl.textContent = "";
+
+    try{
+      const receivedHash = await sha256Hex(value);
+
+      if (receivedHash === HASH_HEX){
+        try{ sessionStorage.setItem(REMEMBER_KEY,"1"); }catch(_){}
+        overlay.classList.add("rgwe-login-success");
+        restorePageScroll();
+        window.setTimeout(function(){ overlay.remove(); },320);
+      }else{
+        input.select();
+        showError("Incorrect password. Please try again.");
+      }
+    }catch(error){
+      showError("Unable to verify access. Please try again.");
+      console.error(error);
+    }finally{
+      setBusy(false);
+    }
+  },{passive:false});
+
+  window.setTimeout(function(){ input.focus(); },120);
 })();
 </script>
 <!-- END: Site-level password gate -->
