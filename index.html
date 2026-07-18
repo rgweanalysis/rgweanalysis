@@ -115,13 +115,15 @@
     .site-card.rswe{background:linear-gradient(135deg,#0f4c6e,#0787a8 50%,#159a88)}
     .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
     .site-logo{
-      width:156px;height:78px;border-radius:20px;display:grid;place-items:center;
+      width:min(230px,48%);height:92px;border-radius:20px;display:grid;place-items:center;
       padding:10px 12px;background:rgba(255,255,255,.96);
       border:1px solid rgba(255,255,255,.48);
       box-shadow:0 12px 28px rgba(2,6,23,.15);
       backdrop-filter:blur(8px);
     }
     .site-logo img{width:100%;height:100%;object-fit:contain;display:block}
+    .site-card.rgwe .site-logo{padding:14px 15px}
+    .site-card.rswe .site-logo{padding:12px 14px}
     .site-logo .logo-fallback{
       display:none;width:100%;height:100%;place-items:center;
       color:#075985;font-size:18px;font-weight:980;letter-spacing:-.04em;
@@ -170,7 +172,7 @@
       body{background-attachment:scroll,scroll}
       .header{padding:12px 14px}.badge{display:none}
       main{padding:22px 12px 46px}.hero{padding:24px 10px 22px}
-      .sites-grid{grid-template-columns:1fr}.site-card{min-height:325px;padding:22px;border-radius:25px}.site-logo{width:142px;height:72px}
+      .sites-grid{grid-template-columns:1fr}.site-card{min-height:325px;padding:22px;border-radius:25px}.site-logo{width:min(205px,62%);height:82px}
     }
   </style>
 </head>
@@ -196,7 +198,7 @@
       <a class="site-card rgwe" href="rgwe-site.html">
         <div>
           <div class="card-top">
-            <div class="site-logo"><img src="logo.png" alt="RGWE logo" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'" /><span class="logo-fallback">RGWE</span></div>
+            <div class="site-logo"><img src="rgwe-logo.png" alt="Ras Ghareb Wind Energy logo" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'" /><span class="logo-fallback">RGWE</span></div>
             <div class="count">Operations Platform</div>
           </div>
           <h3>RGWE Site</h3>
@@ -214,7 +216,7 @@
       <a class="site-card rswe" href="rswe-site.html">
         <div>
           <div class="card-top">
-            <div class="site-logo"><img src="rswe-logo.jpeg" alt="RSWE logo" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'" /><span class="logo-fallback">RSWE</span></div>
+            <div class="site-logo"><img src="rswe-logo.jpeg" alt="Red Sea Wind Energy logo" decoding="async" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'" /><span class="logo-fallback">RSWE</span></div>
             <div class="count">Site Services</div>
           </div>
           <h3>RSWE Site</h3>
