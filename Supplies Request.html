@@ -1476,16 +1476,16 @@
 
 </head>
 
-<body>
-  <div id="authOverlay" role="dialog" aria-modal="true" aria-label="حماية بكلمة مرور">
+<body class="locked">
+  <div id="authOverlay" style="display:flex" role="dialog" aria-modal="true" aria-label="حماية بكلمة مرور">
     <div id="authCard">
       <h2 id="authTitle">حماية بكلمة مرور</h2>
-      <p id="authHint">من فضلك أدخل كلمة المرور للمتابعة.</p>
+      <p id="authHint">ادخل كلمة المرور الخاصة بالسيرفر للوصول للبيانات المشتركة.</p>
       <div id="authRow">
-        <input id="authPass" type="password" inputmode="numeric" autocomplete="current-password" placeholder="" aria-label="كلمة المرور" />
+        <input id="authPass" type="password" autocomplete="current-password" autocomplete="current-password" placeholder="" aria-label="كلمة المرور" />
         <button id="authBtn" type="button">دخول</button>
       </div>
-      <div id="authErr">كلمة المرور غير صحيحة.</div>
+      <div id="authErr">تعذر الدخول. تحقق من كلمة المرور والاتصال بالإنترنت.</div>
     </div>
   </div>
 
@@ -1623,10 +1623,21 @@
       </section>
       <section class="settings-section">
         <h4>إدارة البيانات</h4>
-        <p>مسح بيانات جميع الأقسام المحفوظة على هذا الجهاز. لا يمكن التراجع عن هذا الإجراء.</p>
+        <p>مسح النسخ المؤقتة على هذا الجهاز فقط؛ البيانات السحابية لن يتم حذفها.</p>
         <div class="settings-actions">
-          <button id="btnClearAllData" class="danger">مسح جميع البيانات</button>
+          <button id="btnClearAllData" class="danger">مسح النسخ المحلية</button>
         </div>
+      </section>
+      <section class="settings-section">
+        <h4>مزامنة Cloudflare</h4>
+        <p id="cloudSettingsStatus">جارٍ الاتصال...</p>
+        <div class="settings-actions" style="display:flex;flex-wrap:wrap;gap:8px">
+          <button type="button" id="btnCloudRefresh" class="ghost">تحديث من السحابة</button>
+          <button type="button" id="btnCloudMigrate" class="ghost">رفع بيانات هذا الجهاز للأقسام السحابية الفارغة</button>
+          <button type="button" id="btnCloudResolve" class="danger">حل تعارض القسم الحالي (استبدال المحلي بالسحابي)</button>
+          <button type="button" id="btnCloudLogout" class="ghost">تسجيل الخروج</button>
+        </div>
+        <p style="font-size:12px">قبل حل التعارض، صدّر JSON للاحتفاظ بتعديلات هذا الجهاز. لا تُرفع البيانات المحلية على أقسام موجودة بالفعل بالسحابة تلقائيًا.</p>
       </section>
     </div>
     <div class="modal-actions">
@@ -1688,7 +1699,7 @@
             </div>
             <div class="form-footer-note compact-note">
               <span class="info-badge">i</span>
-              <span>كل قسم له بيانات منفصلة ويتم حفظ التعديلات تلقائيًا على هذا الجهاز.</span>
+              <span>كل قسم له بيانات منفصلة، والتعديلات تُحفظ محليًا ثم تتم مزامنتها مع Cloudflare.</span>
             </div>
           </div>
         </div>
@@ -1719,53 +1730,7 @@
   <div class="toast" id="toast"></div>
 
 
-  <script>
-    (function(){
-      const PASS = "666666";
-      const KEY = "supplies_auth_ok_v1";
-      function lock(){
-        document.body.classList.add("locked");
-        const ov = document.getElementById("authOverlay");
-        if (ov) ov.style.display = "flex";
-        try { document.body.style.overflow = "hidden"; } catch(e){}
-        const ip = document.getElementById("authPass");
-        if (ip) setTimeout(()=>ip.focus(), 50);
-      }
-      function unlock(){
-        document.body.classList.remove("locked");
-        const ov = document.getElementById("authOverlay");
-        if (ov) ov.style.display = "none";
-        try { document.body.style.overflow = ""; } catch(e){}
-      }
-      function showErr(on){
-        const err = document.getElementById("authErr");
-        if (err) err.style.display = on ? "block" : "none";
-      }
-      function init(){
-        const ok = (()=>{ try { return sessionStorage.getItem(KEY)==="1"; } catch(e){ return false; }})();
-        if (!ok) lock(); else unlock();
-
-        const btn = document.getElementById("authBtn");
-        const ip = document.getElementById("authPass");
-        function attempt(){
-          const val = (ip && ip.value) ? ip.value.trim() : "";
-          if (val === PASS){
-            try { sessionStorage.setItem(KEY, "1"); } catch(e){}
-            showErr(false);
-            if (ip) ip.value = "";
-            unlock();
-          } else {
-            showErr(true);
-            if (ip) { ip.select(); ip.focus(); }
-          }
-        }
-        if (btn) btn.addEventListener("click", attempt);
-        if (ip) ip.addEventListener("keydown", (e)=>{ if(e.key==="Enter") attempt(); });
-      }
-      if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
-      else init();
-    })();
-  </script>
+  <!-- Login now validated by Cloudflare Worker; no password is embedded in this public HTML. -->
 
   <script>
     const SOURCE_ITEMS = [{"name": "صابون هاند ووش جركن 2 لتر", "unit": "جركن", "pack": ""}, {"name": "ديتول مطهر 950 مم", "unit": "زجاجة", "pack": ""}, {"name": "معطر جو فريده 460", "unit": "كرتونه", "pack": ""}, {"name": "مناديل سحب", "unit": "علبه", "pack": ""}, {"name": "مناديل مطبخ فاين", "unit": "لفه", "pack": "اللفه 6 بكرات"}, {"name": "منظف ومطهرجنرال فروتس 730 مم", "unit": "كرتونه", "pack": ""}, {"name": "اكياس قمامه كبير 70*90", "unit": "كيلو", "pack": ""}, {"name": "اكياس قمامه صغير 45*50", "unit": "كيلو", "pack": ""}, {"name": "اكياس قمامه صغير80*60", "unit": "كيلو", "pack": ""}, {"name": "دسته فوطه مطبخ ميكروفايبر 30x70 cm", "unit": "دسته", "pack": "دسته 12 قطعة"}, {"name": "مناديل تواليت بكره", "unit": "لفه", "pack": "الفه 6 قطع"}, {"name": "دسته جونتى طبيه لاتكس", "unit": "علبه", "pack": ""}, {"name": "هاربيك منظف تويلت 450 مم", "unit": "كرتونة", "pack": ""}, {"name": "منظف مكنة الاسبريسو", "unit": "زجاجة", "pack": ""}, {"name": "اسبونش غسيل", "unit": "لفه", "pack": "اللفه 30 قطعه"}, {"name": "كبسولات لتنظيف التواليت برائحة مروج اللافندر من هاربيك", "unit": "قطعة", "pack": ""}];
@@ -1842,7 +1807,9 @@ const CATEGORY_CONFIG = {
         meta: { ...state.meta },
         rows: state.rows.map(r => ({
           id: r.id, include: !!r.include, name: r.name || "", unit: r.unit || "",
-          pack: r.pack || "", qty: r.qty ?? "", note: r.note || ""
+          pack: r.pack || "", qty: r.qty ?? "", note: r.note || "",
+          // The built-in catalog photos already ship with the HTML. Sync only custom photos.
+          ...(r.img && r.img !== (getItemImages()[(r.name || "").trim()] || "") ? { img: r.img } : {})
         }))
       };
     }
@@ -1996,6 +1963,7 @@ const CATEGORY_CONFIG = {
       lastSaved = formatTime();
       setDirty(false);
       if (!options.silent) toast(stored ? "تم الحفظ" : "تم الحفظ مؤقتًا داخل الصفحة");
+      queueCloudSave(currentCategory);
       updateStats();
       return stored;
     }
@@ -2020,10 +1988,11 @@ const CATEGORY_CONFIG = {
       clearTimeout(saveTimer);
       saveTimer = setTimeout(() => {
         persistState();
+        queueCloudSave(currentCategory);
         lastSaved = formatTime();
         setDirty(false);
         updateStats();
-      }, 250);
+      }, 350);
     }
 
     function updateMetaFromInputs() {
@@ -2065,8 +2034,9 @@ const CATEGORY_CONFIG = {
         tr.classList.add("row-enter");
         tr.style.setProperty("--row-index", rowMotionIndex++);
 
-        const imgCell = row.img
-          ? `<img class="thumb" src="${row.img}" alt="" />`
+        const safeImageSrc = (typeof row.img === "string" && /^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/=]+$/.test(row.img)) ? row.img : "";
+        const imgCell = safeImageSrc
+          ? `<img class="thumb" src="${safeImageSrc}" alt="" />`
           : `<span class="empty">+ صورة</span>`;
 
         tr.innerHTML = `
@@ -2126,7 +2096,7 @@ const CATEGORY_CONFIG = {
       return c;
     }
 
-    function updateStats() { applyFilter(); }
+    function updateStats() { applyFilter(); renderCloudStatus(); }
 
     function onTableInput(e) {
       const el = e.target;
@@ -2140,13 +2110,11 @@ const CATEGORY_CONFIG = {
       if (el.dataset.action === "img") {
         const file = el.files && el.files[0];
         if (!file) return;
-        const reader = new FileReader();
-        reader.onload = () => {
-          row.img = String(reader.result || "");
+        resizePhoto(file).then(img => {
+          row.img = img;
           saveDebounced();
           render();
-        };
-        reader.readAsDataURL(file);
+        }).catch(err => toast(err.message || "تعذر رفع الصورة"));
         return;
       }
 
@@ -2353,7 +2321,8 @@ const CATEGORY_CONFIG = {
       };
       state.rows = buildInitialRows();
       render();
-      toast("تم المسح");
+      saveDebounced(); // Also synchronize this deliberate reset to other devices.
+      toast("تم تصفير بيانات القسم وستتم مزامنتها");
     }
 
     function fillZeroVisible() {
@@ -2576,8 +2545,12 @@ const CATEGORY_CONFIG = {
 
     function setCategory(cat){
       if (!CATEGORY_CONFIG[cat] || cat === currentCategory) return;
-      // Never let a storage failure block navigation in Chrome.
-      try { persistState(); } catch (e) {}
+      // Flush unfinished edits before changing category; old category stays queued.
+      if (dirty) {
+        clearTimeout(saveTimer);
+        try { persistState(); queueCloudSave(currentCategory); } catch (e) {}
+        dirty = false;
+      }
       currentCategory = cat;
       safeStorageSet(CATEGORY_KEY, currentCategory);
       const searchEl = $("search");
@@ -2627,13 +2600,13 @@ const CATEGORY_CONFIG = {
         const cfg = CATEGORY_CONFIG[cat];
         const x = getCategorySummary(cat);
         return `<article class="report-summary-card">
-          <div class="report-summary-head"><strong>${cfg.label}</strong><span class="category-badge">${x.month}</span></div>
+          <div class="report-summary-head"><strong>${cfg.label}</strong><span class="category-badge">${escapeHtml(x.month)}</span></div>
           <div class="report-summary-stats">
             <div class="report-summary-stat"><span>إجمالي الأصناف</span><b>${x.totalItems}</b></div>
             <div class="report-summary-stat"><span>أصناف مطلوبة</span><b>${x.requestedItems}</b></div>
             <div class="report-summary-stat"><span>إجمالي الكميات</span><b>${x.totalQty}</b></div>
           </div>
-          <div class="report-summary-meta">يعرض البيانات المحفوظة على هذا الجهاز.</div>
+          <div class="report-summary-meta">يعرض أحدث نسخة محفوظة على الجهاز والمزامَنة مع السحابة.</div>
           <button class="ghost" data-open-report-category="${cat}">فتح القسم</button>
         </article>`;
       }).join("");
@@ -2659,14 +2632,285 @@ const CATEGORY_CONFIG = {
     }
 
     function clearAllSavedData(){
-      if (!confirm("هل تريد مسح جميع بيانات الأقسام المحفوظة؟")) return;
+      if (!confirm("مسح النسخ المحلية من هذا الجهاز فقط؟ البيانات على Cloudflare ستبقى كما هي.")) return;
       Object.values(STORAGE_KEYS).forEach(key => safeStorageRemove(key));
+      cloudPending.clear();
+      savePending();
       load();
       render();
       updateTabUI();
       renderReportsSummary();
-      toast("تم مسح جميع البيانات المحفوظة");
+      toast("تم مسح النسخة المحلية فقط. اضغط تحديث من السحابة لاسترجاع البيانات.");
     }
+
+    // ============= Cloudflare D1 synchronization =============
+    // Public API endpoint only. Never put APP_PASSWORD in this GitHub file.
+    const CLOUD_API_URL = "https://REPLACE-WITH-YOUR-WORKER.workers.dev";
+    const CLOUD_PASSWORD_SESSION_KEY = "supplies_cloud_password_session_v1";
+    const CLOUD_VERSIONS_KEY = "supplies_cloud_versions_v1";
+    const CLOUD_PENDING_KEY = "supplies_cloud_pending_v1";
+    const CLOUD_LOCAL_BACKUP_KEY = "supplies_cloud_premerge_backup_v1";
+    const CLOUD_CATEGORIES = Object.keys(CATEGORY_CONFIG);
+    function readStoredJson(key, fallback) {
+      try { return JSON.parse(safeStorageGet(key)) ?? fallback; } catch { return fallback; }
+    }
+    const cloudVersions = { cleaning:0, drinks:0, consumables:0, other:0,
+      ...readStoredJson(CLOUD_VERSIONS_KEY,{}) };
+    const cloudPending = new Set(readStoredJson(CLOUD_PENDING_KEY, []));
+    const cloudBlocked = new Set();
+    const cloudSending = new Set();
+    const cloudTimers = Object.create(null);
+    let cloudPassword = "";
+    let cloudReady = false;
+    let cloudBusy = false;
+    let cloudMessage = "يلزم تسجيل الدخول للسحابة";
+    function savePending(){ safeStorageSet(CLOUD_PENDING_KEY, JSON.stringify([...cloudPending])); }
+    function saveVersions(){ safeStorageSet(CLOUD_VERSIONS_KEY, JSON.stringify(cloudVersions)); }
+    function configuredCloudUrl(){
+      return /^https:\/\/[a-z0-9.-]+(?::\d+)?(?:\/.*)?$/i.test(CLOUD_API_URL) &&
+        !CLOUD_API_URL.includes('REPLACE-');
+    }
+    async function cloudRequest(path, method='GET', body=null) {
+      if (!configuredCloudUrl()) throw new Error('ضع رابط الـ Worker الصحيح داخل ملف index.html أولًا.');
+      const res = await fetch(CLOUD_API_URL.replace(/\/$/, '') + path, {
+        method,
+        cache: 'no-store',
+        headers: {
+          'Authorization': 'Bearer ' + cloudPassword,
+          ...(body !== null ? {'Content-Type':'application/json'} : {})
+        },
+        ...(body !== null ? { body:JSON.stringify(body) } : {})
+      });
+      let result = {};
+      try { result = await res.json(); } catch {}
+      if (!res.ok) {
+        const err = new Error(result.error || `HTTP ${res.status}`);
+        err.status = res.status;
+        err.version = result.version;
+        throw err;
+      }
+      return result;
+    }
+    function renderCloudStatus(){
+      const message = !cloudReady ? cloudMessage :
+        cloudBlocked.size ? 'تعارض في التعديلات — راجع الإعدادات' :
+        cloudPending.size ? `في انتظار رفع ${cloudPending.size} قسم` :
+        cloudSending.size ? 'جارٍ الرفع إلى Cloudflare...' : cloudMessage;
+      if ($('cloudSettingsStatus')) $('cloudSettingsStatus').textContent = message;
+      if ($('headerSaveState')) $('headerSaveState').textContent = message;
+      if ($('kpiSaveHint')) $('kpiSaveHint').textContent = message;
+    }
+    function backupLocal(cat){
+      const raw = safeStorageGet(STORAGE_KEYS[cat]);
+      if (!raw) return;
+      const prior = readStoredJson(CLOUD_LOCAL_BACKUP_KEY, {});
+      prior[cat] = {savedAt: new Date().toISOString(), data:raw};
+      safeStorageSet(CLOUD_LOCAL_BACKUP_KEY, JSON.stringify(prior));
+    }
+    async function refreshCloud(forceCategory=null){
+      if (!cloudReady || cloudBusy) return false;
+      cloudBusy = true;
+      try {
+        const response = await cloudRequest('/api/state');
+        const remote = response.categories || {};
+        let changedActive = false;
+        for (const cat of CLOUD_CATEGORIES) {
+          const doc = remote[cat];
+          if (!doc) continue;
+          if (cloudPending.has(cat) && forceCategory !== cat) continue;
+          if (dirty && cat === currentCategory && forceCategory !== cat) continue;
+          // Avoid replacing active inputs while the user is typing.
+          if (cat === currentCategory && forceCategory !== cat &&
+              document.activeElement?.matches?.('input,textarea')) continue;
+          const incoming = JSON.stringify(doc.data);
+          const oldData = safeStorageGet(STORAGE_KEYS[cat]);
+          if (oldData && oldData !== incoming) backupLocal(cat);
+          cloudVersions[cat] = doc.version;
+          safeStorageSet(STORAGE_KEYS[cat], incoming);
+          if (cat === forceCategory) {
+            cloudBlocked.delete(cat);
+            cloudPending.delete(cat);
+          }
+          if (cat === currentCategory && incoming !== oldData) changedActive = true;
+        }
+        saveVersions(); savePending();
+        if (changedActive) { load(); render(); updateTabUI(); }
+        renderReportsSummary();
+        cloudMessage = 'متصل — البيانات محفوظة على Cloudflare';
+        return true;
+      } catch (err) {
+        cloudMessage = 'تعذر تحديث السحابة: ' + err.message;
+        return false;
+      } finally {
+        cloudBusy = false;
+        renderCloudStatus();
+      }
+    }
+    function queueCloudSave(cat) {
+      if (!CLOUD_CATEGORIES.includes(cat)) return;
+      cloudPending.add(cat);
+      savePending();
+      renderCloudStatus();
+      clearTimeout(cloudTimers[cat]);
+      cloudTimers[cat] = setTimeout(() => sendCloudCategory(cat), 650);
+    }
+    async function sendCloudCategory(cat){
+      if (!cloudReady || cloudSending.has(cat) || cloudBlocked.has(cat) || !cloudPending.has(cat)) return;
+      cloudSending.add(cat);
+      renderCloudStatus();
+      const raw = safeStorageGet(STORAGE_KEYS[cat]);
+      if (!raw) { cloudSending.delete(cat); return; }
+      try {
+        const data = JSON.parse(raw);
+        const response = await cloudRequest('/api/state/' + cat, 'PUT', { version:cloudVersions[cat] || 0, data });
+        cloudVersions[cat] = response.version;
+        saveVersions();
+        if (safeStorageGet(STORAGE_KEYS[cat]) === raw) {
+          cloudPending.delete(cat);
+          savePending();
+        }
+        cloudMessage = 'متصل — البيانات محفوظة على Cloudflare';
+      } catch(err){
+        if (err.status === 409){
+          cloudBlocked.add(cat);
+          cloudMessage = `تعارض في قسم ${CATEGORY_CONFIG[cat].label} — لا يمكن الكتابة فوق تعديل أحدث`;
+          toast('تعارض في التعديلات! صدّر JSON ثم استخدم حل التعارض من الإعدادات.');
+        } else {
+          cloudMessage = 'تعذر رفع البيانات — النسخة المحلية محفوظة، وسنعيد المحاولة';
+        }
+      } finally {
+        cloudSending.delete(cat);
+        renderCloudStatus();
+        if (cloudReady && cloudPending.has(cat) && !cloudBlocked.has(cat)) {
+          // Try after the next edit, online event or refresh. No endless retry loop.
+          if (cloudMessage.startsWith('متصل'))
+            cloudTimers[cat] = setTimeout(() => sendCloudCategory(cat), 700);
+        }
+      }
+    }
+    async function cloudLogin(password){
+      cloudPassword = password;
+      cloudMessage = 'جارٍ تحميل بيانات الأقسام...';
+      renderCloudStatus();
+      try {
+        // Password is verified by the Worker, never by public JavaScript.
+        const response = await cloudRequest('/api/state');
+        cloudReady = true;
+        sessionStorage.setItem(CLOUD_PASSWORD_SESSION_KEY, password);
+        const remote = response.categories || {};
+        for (const cat of CLOUD_CATEGORIES) {
+          const doc = remote[cat];
+          if (!doc || cloudPending.has(cat)) continue;
+          const incoming = JSON.stringify(doc.data);
+          const oldData = safeStorageGet(STORAGE_KEYS[cat]);
+          if (oldData && oldData !== incoming) backupLocal(cat);
+          safeStorageSet(STORAGE_KEYS[cat], incoming);
+          cloudVersions[cat] = doc.version;
+        }
+        saveVersions();
+        load(); render(); updateTabUI(); renderReportsSummary();
+        document.body.classList.remove('locked');
+        $('authOverlay').style.display = 'none';
+        document.body.style.overflow = '';
+        $('authPass').value = '';
+        $('authPass').blur();
+        $('authErr').style.display = 'none';
+        cloudMessage = 'متصل — البيانات محفوظة على Cloudflare';
+        renderCloudStatus();
+        // Resume uploads that were interrupted when a previous tab was closed.
+        for (const cat of cloudPending) sendCloudCategory(cat);
+      } catch(err){
+        cloudReady = false;
+        cloudPassword = '';
+        sessionStorage.removeItem(CLOUD_PASSWORD_SESSION_KEY);
+        $('authErr').textContent = err.message;
+        $('authErr').style.display = 'block';
+        cloudMessage = 'تعذر الدخول أو الاتصال: ' + err.message;
+        renderCloudStatus();
+      }
+    }
+    function logoutCloud(){
+      sessionStorage.removeItem(CLOUD_PASSWORD_SESSION_KEY);
+      cloudReady = false;
+      cloudPassword = '';
+      $('settingsModal').close();
+      document.body.classList.add('locked');
+      $('authOverlay').style.display = 'flex';
+      $('authPass').focus();
+      cloudMessage = 'تم تسجيل الخروج';
+      renderCloudStatus();
+    }
+    function resizePhoto(file){
+      return new Promise((resolve,reject)=>{
+        if (!/^image\/(png|jpeg|webp|gif)$/.test(file.type)) return reject(new Error('اختر صورة JPG أو PNG أو WebP أو GIF.'));
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('تعذر قراءة الصورة')); };
+        img.onload = () => {
+          URL.revokeObjectURL(url);
+          let side = 800;
+          let encoded = '';
+          while (side >= 320){
+            const scale = Math.min(1, side/Math.max(img.width,img.height));
+            const cv = document.createElement('canvas');
+            cv.width = Math.max(1, Math.round(img.width*scale));
+            cv.height = Math.max(1, Math.round(img.height*scale));
+            const c = cv.getContext('2d');
+            c.fillStyle = '#fff'; c.fillRect(0,0,cv.width,cv.height);
+            c.drawImage(img,0,0,cv.width,cv.height);
+            encoded = cv.toDataURL('image/jpeg',0.70);
+            if (encoded.length < 450000) break;
+            side = Math.floor(side*0.70);
+          }
+          if (encoded.length >= 450000) reject(new Error('الصورة كبيرة جدًا بعد الضغط.'));
+          else resolve(encoded);
+        };
+        img.src = url;
+      });
+    }
+    $('authBtn').addEventListener('click', () => cloudLogin($('authPass').value));
+    $('authPass').addEventListener('keydown', e => {
+      if (e.key === 'Enter') cloudLogin($('authPass').value);
+    });
+    $('btnCloudLogout').addEventListener('click', logoutCloud);
+    $('btnCloudRefresh').addEventListener('click', async () => {
+      await refreshCloud(); toast(cloudMessage);
+    });
+    $('btnCloudMigrate').addEventListener('click', async () => {
+      if (!cloudReady) return toast('سجل الدخول أولًا');
+      try {
+        const remote = (await cloudRequest('/api/state')).categories || {};
+        const eligible = CLOUD_CATEGORIES.filter(cat => !remote[cat] && !!safeStorageGet(STORAGE_KEYS[cat]));
+        if (!eligible.length) return toast('لا توجد أقسام سحابية فارغة لها بيانات محلية.');
+        if (!confirm(`رفع البيانات المحلية للأقسام الفارغة فقط: ${eligible.map(x=>CATEGORY_CONFIG[x].label).join('، ')}؟`)) return;
+        eligible.forEach(cat => { cloudVersions[cat]=0; cloudBlocked.delete(cat); queueCloudSave(cat); });
+        toast('تم إدراج الأقسام في قائمة الرفع إلى Cloudflare');
+      } catch(e){toast(e.message);}
+    });
+    $('btnCloudResolve').addEventListener('click', async () => {
+      if (!cloudBlocked.has(currentCategory)) return toast('لا يوجد تعارض في القسم الحالي.');
+      if (!confirm('سيتم الاحتفاظ بنسخة محلية احتياطية واستبدال تغييرات القسم الحالي بنسخة Cloudflare. تأكد من تصدير JSON أولًا. متابعة؟')) return;
+      backupLocal(currentCategory);
+      cloudPending.delete(currentCategory); savePending();
+      const synced = await refreshCloud(currentCategory);
+      toast(synced ? 'تم تنزيل نسخة Cloudflare وحل التعارض' : 'لم يكتمل التحديث من السحابة');
+    });
+    window.addEventListener('online', () => {
+      if (!cloudReady) return;
+      for (const cat of cloudPending) sendCloudCategory(cat);
+      refreshCloud();
+    });
+    window.addEventListener('focus', () => {
+      if (!cloudReady) return;
+      for (const cat of cloudPending) sendCloudCategory(cat);
+      if (!cloudPending.size) refreshCloud();
+    });
+    setInterval(() => {
+      if (cloudReady && !cloudPending.size && !dirty) refreshCloud();
+    }, 30000);
+    const previousPassword = sessionStorage.getItem(CLOUD_PASSWORD_SESSION_KEY);
+    if (previousPassword) cloudLogin(previousPassword);
+    else $('authPass').focus();
 
     // Wire up
     const savedCategory = safeStorageGet(CATEGORY_KEY);
